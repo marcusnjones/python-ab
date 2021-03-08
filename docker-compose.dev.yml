@@ -1,0 +1,26 @@
+version: '3.7'
+
+services:
+  api:
+    build:
+      context: ./api
+      dockerfile: Dockerfile.dev
+    container_name: python-ab_api
+    depends_on: [mysql]
+    networks:
+      - python-ab-network
+    restart: 'no'
+
+  mysql:
+    container_name: python-ab_mysql
+    env_file: ./dev.env
+    # expose:
+    #   - "${MONGO_PORT}"
+    image: mysql:8.0.23
+    networks:
+      - python-ab-network
+    restart: 'no'
+
+networks:
+  python-ab-network:
+    name: python-ab-network

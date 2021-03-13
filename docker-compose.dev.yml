@@ -5,6 +5,7 @@ services:
     build:
       context: ./api
       dockerfile: Dockerfile.dev
+    command: bash -c "/wait-for-it.sh --timeout=0 mysql:${MYSQL_PORT}"
     container_name: python-ab_api
     depends_on: [mysql]
     networks:
@@ -12,13 +13,22 @@ services:
     restart: 'no'
 
   mysql:
+    command: --default-authentication-plugin=mysql_native_password
     container_name: python-ab_mysql
     env_file: ./dev.env
-    # expose:
-    #   - "${MONGO_PORT}"
     image: mysql:8.0.23
     networks:
       - python-ab-network
+    restart: 'no'
+
+  adminer:
+    container_name: python-ab_adminer
+    image: adminer
+    restart: always
+    networks:
+      - python-ab-network
+    ports:
+      - ${ADMINER_PORT}:8080
     restart: 'no'
 
 networks:

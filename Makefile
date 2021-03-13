@@ -30,7 +30,7 @@ list_allowed_args := name inventory
 mkfile_path := $(abspath $(lastword $(MAKEFILE_LIST)))
 current_dir := $(notdir $(patsubst %/,%,$(dir $(mkfile_path))))
 
-.PHONY: list help build-dev build-prod up-dev force-up-dev up-prod force-up-prod run-dev run-prod force-run-dev force-run-dev
+.PHONY: list help dev-build dev-build-force prod-build prod-build-force dev-up dev-up-force prod-up prod-up-force dev-run dev-stop prod-run prod-stop dev-run-force prod-run-force
 
 help:
 	@echo "Make commands for provisioning $(container_name)"
@@ -38,28 +38,40 @@ help:
 list:
 	@$(MAKE) -qp | awk -F':' '/^[a-zA-Z0-9][^$#\/\t=]*:([^=]|$$)/ {split($$1,A,/ /);for(i in A)print A[i]}' | sort
 
-build-dev:
+dev-build:
+	docker-compose -f docker-compose.dev.yml build
+
+dev-build-force:
 	docker-compose -f docker-compose.dev.yml build --no-cache
 
-build-prod:
-	docker-compose -f docker-compose.prod.yml build --no-cache
-
-up-dev:
+dev-up:
 	docker-compose -f docker-compose.dev.yml up
 
-force-up-dev:
+dev-up-force:
 	docker-compose -f docker-compose.dev.yml up --force-recreate
 
-up-prod:
+dev-run: dev-build dev-up
+
+dev-run-force: dev-build-force dev-up-force
+
+dev-stop:
+	docker-compose -f docker-compose.dev.yml down --remove-orphans
+
+prod-build:
+	docker-compose -f docker-compose.prod.yml build
+
+prod-build-force:
+	docker-compose -f docker-compose.prod.yml build --no-cache
+
+prod-up:
 	docker-compose -f docker-compose.prod.yml up
 
-force-up-prod:
+prod-up-force:
 	docker-compose -f docker-compose.prod.yml up --force-recreate
 
-run-dev: build-dev up-dev
+prod-run: prod-build prod-up
 
-run-prod: build-prod up-prod
+prod-run-force: prod-build-force prod-up-force
 
-force-run-dev: build-dev force-up-dev
-
-force-run-dev: build-dev force-up-prod
+prod-stop:
+	docker-compose -f docker-compose.dev.yml down --remove-orphans

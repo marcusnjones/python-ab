@@ -11,10 +11,13 @@ RUN apt -qq -y update && \
         python3 \
         python3-pip
 
+RUN pip3 install fastapi \
+    uvicorn[standard]
+
 RUN curl -L 'https://raw.githubusercontent.com/marcusnjones/wait-for-it/master/wait-for-it.sh' > ./wait-for-it.sh
 
 RUN chmod +x ./wait-for-it.sh
 
 WORKDIR /var/src/app
 
-CMD [ "tail", "-f", "/dev/null" ]
+# CMD ["tail", "-f", "/dev/null"]

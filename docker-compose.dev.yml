@@ -5,12 +5,16 @@ services:
     build:
       context: ./api
       dockerfile: Dockerfile.dev
-    command: bash -c "/wait-for-it.sh --timeout=0 mysql:${MYSQL_PORT}"
+    command: bash -c "/wait-for-it.sh --timeout=0 mysql:${MYSQL_PORT}" && uvicorn main:app --reload
     container_name: python-ab_api
     depends_on: [mysql]
     networks:
       - python-ab-network
+    ports:
+      - "${API_PORT}:8000"
     restart: 'no'
+    volumes:
+      - ./api/src:/var/src/app
 
   mysql:
     command: --default-authentication-plugin=mysql_native_password
